@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+  <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+  <style>
+    .jumbotron {
+      height: 200px;
+      margin: 0;
+      background-color:black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+   .panel > .panel-heading {
+    background-image: none;
+    background-color: black;
+    color: white;
+
+}
+
+    body {
+      margin-left: 100px;
+      margin-right: 100px;
+      background-color: rgb(204, 139, 54);
+      color: white;
+    }
+    .panel{
+        background-color: rgb(126, 104, 76);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="jumbotron">
+        <div class="col-md-6">
+                <h2>Anytime is train time!!!</h2>
+            </div>
+            <div class="col-md-3">
+                <img src="train.jpg" style="width:400px;height:200px;float:left;" />
+            </div>
+  </div>
+
+  <div class="panel panel-default col-md-10 col-md-offset-1" style="margin-top: 20px;">
+    <div class="panel-heading">Add Train</div>
+    <div class="panel-body">
+
+      <form action="/action_page.php">
+        <div class="form-group">
+          <label for="trainname">Train Name</label>
+          <input type="text" class="form-control" id="trainname">
+        </div>
+        <div class="form-group">
+          <label for="destination">Destination</label>
+          <input type="text" class="form-control" id="destination">
+        </div>
+        <div class="form-group">
+          <label for="firsttraintime">First Train Time(HH:mm-military time)</label>
+          <input type="text" class="form-control" id="firsttraintime">
+        </div>
+        <div class="form-group">
+          <label for="frequency">Frequency</label>
+          <input type="text" class="form-control" id="frequency">
+        </div>
+
+        <button type="submit" class="btn btn-default" id="submit" style="background-color: black; color:white;">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel panel-default col-md-10 col-md-offset-1" style="margin-top: 20px;">
+    <div class="panel-heading">Current Train Schedule</div>
+    <div class="panel-body">
+      <table class="table" id="mytable">
+        <thead>
+          <tr>
+            <th>Train Name</th>
+            <th>Destination</th>
+            <th>Frequency (min)</th>
+            <th>Next Arrival</th>
+            <th>Minutes Away</th>
+          </tr>
+        </thead>
+        <!--    <tbody>
+          <tr>
+            <td>One</td>
+            <td>London</td>
+            <td>10</td>
+            <td>12:00</td>
+            <td>2</td>
+          </tr>
+          <tr>
+              <td>One</td>
+              <td>London</td>
+              <td>10</td>
+              <td>12:00</td>
+              <td>2</td>
+          </tr>
+          <tr>
+              <td>One</td>
+              <td>London</td>
+              <td>10</td>
+              <td>12:00</td>
+              <td>2</td>
+          </tr>
+        </tbody> -->
+      </table>
+    </div>
+    <!-- jQuery -->
+    <!--<script src="https://code.jquery.com/jquery.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script> -->
+    <script>
+
+     /* global firebase moment */
+// Steps to complete:
+
+// 1. Initialize Firebase
+// 2. Create button for adding new employees - then update the html + update the database
+// 3. Create a way to retrieve employees from the employee database.
+// 4. Create a way to calculate the months worked. Using difference between start and current time.
+//    Then use moment.js formatting to set difference in months.
+// 5. Calculate Total billed
+
+// 1. Initialize Firebase
+var config = {
+        apiKey: "AIzaSyBnMg43KBPDu8nLgDs5ZNZKsM5pNyOILEM",
+        authDomain: "traininformation-db43d.firebaseapp.com",
+        databaseURL: "https://traininformation-db43d.firebaseio.com",
+        projectId: "traininformation-db43d",
+        storageBucket: "traininformation-db43d.appspot.com",
+        messagingSenderId: "753493706534"
+      };
+      firebase.initializeApp(config);
+
+var database = firebase.database();
+
+// 2. Button for adding Employees
+$("#submit").on("click", function(event) {
+  event.preventDefault();
+
+  // Grabs user input
+  var trainname = $("#trainname").val().trim();
+  var destination = $("#destination").val().trim();
+  var firsttraintime = $("#firsttraintime").val().trim();
+  var frequency = $("#frequency").val().trim();
+
+  // Creates local "temporary" object for holding employee data
+  var traindata = {
+    trainname: trainname,
+    destination: destination,
+    firsttraintime: firsttraintime,
+    frequency: frequency
+  };
+
+  // Uploads employee data to the database
+  database.ref().push(traindata);
+
+  // Logs everything to console
+  console.log(traindata.trainname);
+  console.log(traindata.destination);
+  console.log(traindata.firsttraintime);
+  console.log(traindata.frequency);
+
+  // Alert
+  alert("New train information added succesfully!");
+
+  // Clears all of the text-boxes
+  $("#trainname").val("");
+  $("#destination").val("");
+  $("#firsttraintime").val("");
+  $("#frequency").val("");
+});
+
+// 3. Create Firebase event for adding employee to the database and a row in the html when a user adds an entry
+database.ref().on("child_added", function(childSnapshot, prevChildKey) {
+
+  console.log(childSnapshot.val());
+
+  // Store everything into a variable.
+  var trainname = childSnapshot.val().trainname;
+  var destination = childSnapshot.val().destination;
+  var firsttraintime = childSnapshot.val().firsttraintime;
+  var frequency = childSnapshot.val().frequency;
+
+  // Employee Info
+  console.log(trainname);
+  console.log(destination);
+  console.log(firsttraintime);
+  console.log(frequency);
+
+  
+
+      var startTime = moment(firsttraintime, "hh:mm");
+               // var frequency = 15;
+                var diff = moment().diff(startTime, "minutes");
+
+                
+                var minutesaway = frequency - (diff % frequency);
+                var nextArrival = moment().add(minutesaway, "minutes").format("HH:mm");
+
+                console.log("arrivesIn:" + minutesaway + ",nextArrival:" + nextArrival);
+
+
+
+                $("#mytable").append("<tr><td>" + childSnapshot.val().trainname + "</td><td>" + childSnapshot.val().destination + "</td><td>" + childSnapshot.val().frequency + "</td><td>" + nextArrival + "</td><td>" + minutesaway + "</td></tr>");
+ 
+
+});
+
+
+
+
+
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
