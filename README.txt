@@ -15,7 +15,7 @@ We used Moment.js to format the time and calulate the next arrival and minutes a
 
 
 Click on the following link to preview the completed assignment.
-https://aparajitamanicka.github.io/Gif-tastic/
+https://aparajitamanicka.github.io/Train-Data/
 
 Built With
 HTML5
